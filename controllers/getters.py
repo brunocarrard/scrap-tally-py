@@ -1,6 +1,6 @@
-from unittest import result
 from controllers.db_connection import DatabaseConnection
 import pyodbc
+
 class Getters:
     def get_users():
         cnxn = DatabaseConnection.get_db_connection()
