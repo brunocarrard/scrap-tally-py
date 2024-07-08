@@ -10,17 +10,11 @@ class Getters:
         cursor.execute("SELECT UserCode, UserGrpCode FROM T_UserFunction WHERE UserGrpCode IN ('SFC', 'SFA') AND UserCode <> N''")
         rows = cursor.fetchall()
 
-        results_dict = {}
+        result = []
 
         for row in rows:
-            user_code = row[0].strip()
-            user_group_code = row[1].strip()
-
-            if user_code not in results_dict:
-                results_dict[user_code] = []
-
-            results_dict[user_code].append(user_group_code)
+            result.append(row[0].strip())
 
         cursor.close()
         cnxn.close()
-        return results_dict
+        return result
