@@ -1,5 +1,4 @@
 from controllers.db_connection import DatabaseConnection
-import pyodbc
 
 class Getters:
     def get_users():
