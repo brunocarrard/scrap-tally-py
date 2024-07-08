@@ -4,8 +4,8 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-@app.route('/')
-def hello_world():
+@app.route('/users')
+def get_users():
     # To test the get_test_user_group function
     user_groups = Getters.get_users()
     return user_groups
