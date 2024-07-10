@@ -12,7 +12,7 @@ class Getters:
         result = []
 
         for row in rows:
-            result.append(row[0].strip())
+            result.append({"id":row[0].strip(), "description":row[1].strip()})
 
         cursor.close()
         cnxn.close()
@@ -22,26 +22,25 @@ class Getters:
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
 
-        cursor.execute("""SELECT MachGrpCode FROM T_MachGrp WHERE MachGrpCode <> N'' AND MachGrpCode NOT IN (
-                       'EXDC', 
-                       'EXEC', 
-                       'EXPC', 
-                       'EXTR', 
-                       'EXZC', 
-                       'MBM', 
-                       'MBPM', 
-                       'MLCM', 
-                       'MSM', 
-                       'MWM', 
-                       'PACK', 
-                       'PPAP', 
-                       'SAW')""")
+        cursor.execute("""SELECT MachGrpCode, Description FROM T_MachGrp WHERE MachGrpCode <> N'' AND Description NOT IN (
+                       'External Diecutting', 
+                       'External e-Cote', 
+                       'External Power Cote', 
+                       'External Machining', 
+                       'External Zinc Coating', 
+                       'Metal Bending Machine', 
+                       'Metal Brake Press Machine', 
+                       'Metal Laser Cutter Machine', 
+                       'Metal Saw Machine', 
+                       'Metal Welding Machine', 
+                       'DO NOT USE', 
+                       'Chop Saw')""")
         rows = cursor.fetchall()
 
         result = []
 
         for row in rows:
-            result.append(row[0].strip())
+            result.append({"id":row[0].strip(), "description":row[1].strip()})
 
         cursor.close()
         cnxn.close()
@@ -51,7 +50,7 @@ class Getters:
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
 
-        query = """SELECT Description from T_Mach WHERE MachGrpCode = ? AND MachGrpCode <> N'' AND Description NOT IN (
+        query = """SELECT MachCode, Description from T_Mach WHERE MachGrpCode = ? AND MachGrpCode <> N'' AND Description NOT IN (
         'Boxing MINN', 
         'External e-Cote', 
         'External Power Code', 
@@ -73,7 +72,7 @@ class Getters:
         result = []
 
         for row in rows:
-            result.append(row[0].strip())
+            result.append({"id":row[0].strip(), "description":row[1].strip()})
         
         cursor.close()
         cnxn.close()
