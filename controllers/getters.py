@@ -81,3 +81,35 @@ class Getters:
         cursor.close()
         cnxn.close()
         return result
+    
+    def get_defect_types(): 
+        cnxn = DatabaseConnection.get_db_connection() 
+        cursor = cnxn.cursor() 
+        cursor.execute("SELECT DISTINCT DefectType FROM ST_LEG_Defect WHERE DefectType <> N''")
+
+        rows = cursor.fetchall() 
+        result = [] 
+
+        for row in rows: 
+            result.append(row[0].strip()) 
+        
+        cursor.close()
+        cnxn.close()
+        return result
+    
+    def get_defect_conditions(defect_type): 
+        cnxn = DatabaseConnection.get_db_connection() 
+        cursor = cnxn.cursor() 
+        query = "SELECT DefectCode, DefectCondition from ST_LEG_Defect WHERE DefectType = ? AND DefectType <> N''"
+    
+        cursor.execute(query, (defect_type,)) 
+        rows = cursor.fetchall() 
+
+        result = [] 
+
+        for row in rows: 
+            result.append({"id":row[0].strip(), "description":row[1].strip()}) 
+            
+        cursor.close() 
+        cnxn.close() 
+        return result
