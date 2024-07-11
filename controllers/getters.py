@@ -6,7 +6,11 @@ class Getters:
         cursor = cnxn.cursor()
         
         # SFC (shop floor control) is operators, SFA (shop floor admin) should also have access?
-        cursor.execute("SELECT UserCode, UserGrpCode FROM T_UserFunction WHERE UserGrpCode IN ('SFC', 'SFA') AND UserCode <> N''")
+        cursor.execute("""SELECT DISTINCT u.Usercode, e.[FullName] 
+                       FROM T_UserFunction U INNER JOIN T_employee E on U.UserCode = E.EmpId 
+                       WHERE UserGrpCode IN ('SFC', 'SFA') AND UserCode <> N''""")
+
+        # cursor.execute("SELECT UserCode, UserGrpCode FROM T_UserFunction WHERE UserGrpCode IN ('SFC', 'SFA') AND UserCode <> N''")
         rows = cursor.fetchall()
 
         result = []
