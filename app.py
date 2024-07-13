@@ -21,5 +21,16 @@ def get_machines():
     machines = Getters.get_machines(process)
     return machines
 
+@app.route('/defect-types') 
+def get_defect_types(): 
+    defect_types = Getters.get_defect_types() 
+    return defect_types 
+
+@app.route('/defect-conditions') 
+def get_defect_conditions(): 
+    defect_type = request.args.get('defect-type', default='', type=str) 
+    defect_conditions = Getters.get_defect_conditions(defect_type) 
+    return defect_conditions
+
 if __name__ == '__main__':
     app.run(debug=True)
