@@ -131,3 +131,20 @@ class Getters:
         cursor.close() 
         cnxn.close() 
         return result
+    
+
+    def get_parts(): 
+        cnxn = DatabaseConnection.get_db_connection() 
+        cursor = cnxn.cursor()
+
+        cursor.execute("SELECT DISTINCT PartCode, Description FROM T_Part WHERE PartCode <> N''")
+
+        rows = cursor.fetchall() 
+        result = [] 
+
+        for row in rows: 
+            result.append({"id":row[0].strip(), "description":row[1].strip()})
+        
+        cursor.close()
+        cnxn.close()
+        return result
