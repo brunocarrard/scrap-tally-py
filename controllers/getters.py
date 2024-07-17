@@ -149,7 +149,7 @@ class Getters:
 
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
-        
+
         cursor.execute("SELECT DISTINCT PartCode, Description, SalesPartGrpCode FROM T_Part WHERE PartCode <> N''")
 
         rows = cursor.fetchall() 
@@ -161,4 +161,19 @@ class Getters:
         
         cursor.close()
         cnxn.close()
+        return result
+    
+    def get_part_type(part):
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+
+        query = """SELECT DISTINCT T_Part.SalesPartGrpCode, T_SalesPartGrp.Description FROM T_Part 
+        INNER JOIN T_SalesPartGrp ON T_Part.SalesPartGrpCode = T_SalesPartGrp.SalesPartGrpCode
+        WHERE T_Part.PartCode = ?"""
+    
+        cursor.execute(query, part)
+        row = cursor.fetchone()
+
+        result = [{"id":row[0].strip(), "description":row[1].strip()}]
+
         return result
