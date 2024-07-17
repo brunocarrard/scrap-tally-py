@@ -34,9 +34,16 @@ def get_defect_conditions():
     return defect_conditions
 
 @app.route('/parts') 
-def get_parts(): 
-    parts = Getters.get_parts() 
-    return parts 
+def get_parts():
+    process = request.args.get('process', default='', type=str)
+    parts = Getters.get_parts(process) 
+    return parts
+
+@app.route('/part-type') 
+def get_part_type():
+    part = request.args.get('part', default='', type=str)
+    part_type = Getters.get_part_type(part)
+    return part_type
 
 if __name__ == '__main__':
     app.run(debug=True)

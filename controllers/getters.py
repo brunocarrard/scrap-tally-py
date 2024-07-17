@@ -10,7 +10,6 @@ class Getters:
                        FROM T_UserFunction U INNER JOIN T_employee E on U.UserCode = E.EmpId 
                        WHERE UserGrpCode IN ('SFC', 'SFA') AND UserCode <> N''""")
 
-        # cursor.execute("SELECT UserCode, UserGrpCode FROM T_UserFunction WHERE UserGrpCode IN ('SFC', 'SFA') AND UserCode <> N''")
         rows = cursor.fetchall()
 
         result = []
@@ -100,19 +99,19 @@ class Getters:
         return result
     
     def get_defect_conditions(process, defect_type): 
-        # Filter by both process and defect type
+        # Filter by both process (MachGrpCode from T_Mach) and defect type
         process_defect_codes = {
-        "ROUT": ["DEL", "DSU", "DIS", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "RHL", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
-        "KNIF": ["DEL", "DSU", "DIS", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "RHL", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
-        "TENR": ["DEL", "DSU", "DIS", "FRE", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "RHL", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
-        "BOX": ["DEL", "DSU", "FRE", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "CWS", "SMD", "MIA", "TLD", "IRT"],
-        "ASSY": ["MSH", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
-        "KIT": ["MSH", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
-        "BRUN": ["SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
-        "DIEC": ["SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
-        "WJET": ["MSH", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
-        "RUBB": ["WRP", "DDC", "MOV", "NSQ", "RHD", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
-        "PU": ["DEL", "DSU", "WRP", "DDC", "RHL", "RHD", "SMD", "TLD", "IRT"]
+            "ROUT": ["DEL", "DSU", "DIS", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "RHL", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
+            "KNIF": ["DEL", "DSU", "DIS", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "RHL", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
+            "TENR": ["DEL", "DSU", "DIS", "FRE", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "RHL", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
+            "BOX": ["DEL", "DSU", "FRE", "TIC", "MSH", "PIT", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "CWS", "SMD", "MIA", "TLD", "IRT"],
+            "ASSY": ["MSH", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
+            "KIT": ["MSH", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
+            "BRUN": ["SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
+            "DIEC": ["SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
+            "WJET": ["MSH", "SCR", "SCRS", "2LG", "2SH", "OFL", "WMU", "HOL", "WRP", "DDC", "MOV", "NSQ", "CWS", "SMD"],
+            "RUBB": ["WRP", "DDC", "MOV", "NSQ", "RHD", "SMD", "DCT", "PCT", "MIA", "TLD", "IRT", "BSD"],
+            "PU": ["DEL", "DSU", "WRP", "DDC", "RHL", "RHD", "SMD", "TLD", "IRT"]
         }
 
         cnxn = DatabaseConnection.get_db_connection() 
@@ -133,17 +132,32 @@ class Getters:
         return result
     
 
-    def get_parts(): 
-        cnxn = DatabaseConnection.get_db_connection() 
-        cursor = cnxn.cursor()
+    def get_parts(process):
+        # Each process has certain types of materials (SalesPartGrpCode from T_SalesPartGrp)
+        process_part_types = {
+            "ROUT": ["KKFO", "UFFO", "UGFO", "SG38", "SGFO", "EVOL"],
+            "KNIF": ["DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSUL"],
+            "TENR": ["KKFO", "UFFO", "UGFO", "SG38", "SGFO", "EVOL"],
+            "BOX": ["DTCK", "DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
+            "KIT": ["DTCK", "DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
+            "BRUN": ["DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
+            "DIEC": ["DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
+            "WJET": ["AGRM", "AMBR", "AMFO", "ARMR", "TRLN", "RTBM", "HMRM", "UTIL", "TRLN", "BRUB"],
+            "RUBB": ["AGRM", "AMBR", "AMFO", "ARMR", "BRUB", "ECGR", "HMRM", "RTBM", "TRLN", "UTIL"],
+            "PU": ["POLY"]
+        }
 
-        cursor.execute("SELECT DISTINCT PartCode, Description FROM T_Part WHERE PartCode <> N''")
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+        
+        cursor.execute("SELECT DISTINCT PartCode, Description, SalesPartGrpCode FROM T_Part WHERE PartCode <> N''")
 
         rows = cursor.fetchall() 
         result = [] 
 
-        for row in rows: 
-            result.append({"id":row[0].strip(), "description":row[1].strip()})
+        for row in rows:
+            if row[2].strip() in process_part_types[process]:
+                result.append({"id":row[0].strip(), "description":row[1].strip()})
         
         cursor.close()
         cnxn.close()
