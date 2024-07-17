@@ -27,10 +27,23 @@ def get_defect_types():
     return defect_types 
 
 @app.route('/defect-conditions') 
-def get_defect_conditions(): 
+def get_defect_conditions():
+    process = request.args.get('process', default='', type=str)
     defect_type = request.args.get('defect-type', default='', type=str) 
-    defect_conditions = Getters.get_defect_conditions(defect_type) 
+    defect_conditions = Getters.get_defect_conditions(process, defect_type) 
     return defect_conditions
+
+@app.route('/parts') 
+def get_parts():
+    process = request.args.get('process', default='', type=str)
+    parts = Getters.get_parts(process) 
+    return parts
+
+@app.route('/part-type') 
+def get_part_type():
+    part = request.args.get('part', default='', type=str)
+    part_type = Getters.get_part_type(part)
+    return part_type
 
 if __name__ == '__main__':
     app.run(debug=True)
