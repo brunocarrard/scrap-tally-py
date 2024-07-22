@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from controllers.getters import Getters
+from controllers.scrap_tally import ScrapTally
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -8,7 +9,7 @@ CORS(app)
 @app.route('/users')
 def get_users():
     user_groups = Getters.get_users()
-    return user_groups
+    return jsonify(user_groups)
 
 @app.route('/processes')
 def get_processes():
@@ -19,31 +20,40 @@ def get_processes():
 def get_machines():
     process = request.args.get('process', default='', type=str)
     machines = Getters.get_machines(process)
-    return machines
+    return jsonify(machines)
 
 @app.route('/defect-types') 
 def get_defect_types(): 
     defect_types = Getters.get_defect_types() 
-    return defect_types 
+    return jsonify(defect_types)
 
 @app.route('/defect-conditions') 
 def get_defect_conditions():
     process = request.args.get('process', default='', type=str)
     defect_type = request.args.get('defect-type', default='', type=str) 
     defect_conditions = Getters.get_defect_conditions(process, defect_type) 
-    return defect_conditions
+    return jsonify(defect_conditions)
 
 @app.route('/parts') 
 def get_parts():
     process = request.args.get('process', default='', type=str)
     parts = Getters.get_parts(process) 
-    return parts
+    if len(parts) == 0:
+        return jsonify({"error": "No part found for this process."}), 404
+    return jsonify(parts)
 
 @app.route('/part-type') 
 def get_part_type():
     part = request.args.get('part', default='', type=str)
     part_type = Getters.get_part_type(part)
-    return part_type
+    return jsonify(part_type)
+
+@app.route('/scrap-tally', methods=['POST']) 
+def post_scrap_tally():
+    payload = request.json
+    defect = Getters.get_defect(payload.get('defectType'), payload.get('defectCondition'))
+    ScrapTally.postScrap(payload, defect)
+    return ('Scrap was inserted.')
 
 if __name__ == '__main__':
     app.run(debug=True)

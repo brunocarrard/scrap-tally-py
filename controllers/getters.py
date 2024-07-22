@@ -1,4 +1,5 @@
 from controllers.db_connection import DatabaseConnection
+from datetime import datetime, timedelta
 
 class Getters:
     def get_users():
@@ -133,31 +134,24 @@ class Getters:
     
 
     def get_parts(process):
-        # Each process has certain types of materials (SalesPartGrpCode from T_SalesPartGrp)
-        process_part_types = {
-            "ROUT": ["KKFO", "UFFO", "UGFO", "SG38", "SGFO", "EVOL"],
-            "KNIF": ["DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSUL"],
-            "TENR": ["KKFO", "UFFO", "UGFO", "SG38", "SGFO", "EVOL"],
-            "BOX": ["DTCK", "DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
-            "KIT": ["DTCK", "DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
-            "BRUN": ["DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
-            "DIEC": ["DTCL", "DTDR", "DTWL", "ELCL", "ELCW", "ELDR", "ELDW", "ELWL", "ELWW", "INSU"],
-            "WJET": ["AGRM", "AMBR", "AMFO", "ARMR", "TRLN", "RTBM", "HMRM", "UTIL", "TRLN", "BRUB"],
-            "RUBB": ["AGRM", "AMBR", "AMFO", "ARMR", "BRUB", "ECGR", "HMRM", "RTBM", "TRLN", "UTIL"],
-            "PU": ["POLY"]
-        }
+        current_monday = datetime.today() - timedelta(days=datetime.today().weekday())
+        current_friday = current_monday + timedelta(days=4)
 
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
-
-        cursor.execute("SELECT DISTINCT PartCode, Description, SalesPartGrpCode FROM T_Part WHERE PartCode <> N''")
-
+        cursor.execute("""
+            SELECT DISTINCT P.PartCode, P.Description
+            FROM T_ProdBillOfOper BOO
+            INNER JOIN T_ProductionHeader PH ON BOO.ProdHeaderDossierCode = PH.ProdHeaderDossierCode
+            INNER JOIN T_Part P ON P.PartCode = PH.PartCode
+            WHERE BOO.StartDate BETWEEN ? AND ?
+                AND BOO.MachGrpCode = ?
+                       """, (current_monday, current_friday, process))
         rows = cursor.fetchall() 
         result = [] 
 
         for row in rows:
-            if row[2].strip() in process_part_types[process]:
-                result.append({"id":row[0].strip(), "description":row[1].strip()})
+            result.append({"id":row[0].strip(), "description":row[1].strip()})
         
         cursor.close()
         cnxn.close()
@@ -175,5 +169,17 @@ class Getters:
         row = cursor.fetchone()
 
         result = [{"id":row[0].strip(), "description":row[1].strip()}]
+
+        return result
+    
+    def get_defect(type, condition):
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+        cursor.execute("""
+            SELECT DefectCode FROM ST_LEG_Defect WHERE DefectType = ? AND DefectCondition = ?
+                       """, (type, condition))
+        result = cursor.fetchone()[0].strip()
+        cursor.close()
+        cnxn.close()
 
         return result
