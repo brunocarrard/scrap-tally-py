@@ -55,5 +55,13 @@ def post_scrap_tally():
     ScrapTally.postScrap(payload, defect)
     return ('Scrap was inserted.')
 
+@app.route('/scrap-tally') 
+def get_scrap_tally():
+    page = request.args.get('page', default=1, type=int)
+    user_code = request.args.get('user_code', default=None, type=str)
+    print(page, user_code)
+    scrap_tally = Getters.get_scrap_table(page, user_code)
+    return jsonify(scrap_tally)
+
 if __name__ == '__main__':
     app.run(debug=True)
