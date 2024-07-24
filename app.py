@@ -63,5 +63,11 @@ def get_scrap_tally():
     scrap_tally = Getters.get_scrap_table(page, user_code)
     return jsonify(scrap_tally)
 
+@app.route('/scrap-tally', methods=['PATCH']) 
+def update_scrap_tally():
+    payload = request.json
+    ScrapTally.updateScrap(payload)
+    return ('Scrap was updated.')
+
 if __name__ == '__main__':
     app.run(debug=True)

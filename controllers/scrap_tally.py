@@ -12,3 +12,29 @@ class ScrapTally:
         cursor.commit()
         cursor.close()
         cnxn.close()
+
+    def updateScrap(payload):
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+        cursor.execute("""
+            EXEC SIP_upd_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                       """, (
+                           payload.get('ScrapTally'),
+                           payload.get('LastUpdatedOn'),
+                           datetime.today().date(),
+                           payload.get('MachCode'),
+                           str(payload.get('PartCode')),
+                           payload.get('MachGrpCode'),
+                           payload.get('FullSheetInd'),
+                           payload.get('Qty'),
+                           payload.get('DefectCode'),
+                           payload.get('Comment'),
+                           0,
+                           payload.get('LastUpdatedOn'),
+                           payload.get('User')
+                       )
+        )
+
+        cursor.commit()
+        cursor.close()
+        cnxn.close()
