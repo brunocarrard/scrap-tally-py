@@ -281,7 +281,6 @@ class Getters:
         cursor.execute(query, (scrap_tally,))
         
         result = cursor.fetchone().LastUpdatedOn
-        # .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
         cursor.close()
         cnxn.close()
