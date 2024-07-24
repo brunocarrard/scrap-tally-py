@@ -273,3 +273,17 @@ class Getters:
                 "page": page
             }
         return result
+    
+    def get_last_upd_on(scrap_tally):
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+        query = "SELECT LastUpdatedOn FROM ST_LEG_ScrapTally WHERE ScrapTally = ?"
+        cursor.execute(query, (scrap_tally,))
+        
+        result = cursor.fetchone().LastUpdatedOn
+        # .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+
+        cursor.close()
+        cnxn.close()
+
+        return result

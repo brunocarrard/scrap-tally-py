@@ -1,4 +1,6 @@
+from math import e
 from flask import Flask, request, jsonify
+from controllers import scrap_tally
 from controllers.getters import Getters
 from controllers.scrap_tally import ScrapTally
 from flask_cors import CORS
@@ -66,8 +68,16 @@ def get_scrap_tally():
 @app.route('/scrap-tally', methods=['PATCH']) 
 def update_scrap_tally():
     payload = request.json
-    ScrapTally.updateScrap(payload)
+    defect = Getters.get_defect(payload.get('defectType'), payload.get('defectCondition'))
+    last_upd_on = Getters.get_last_upd_on(payload.get('scrapTally'))
+    ScrapTally.updateScrap(payload, defect, last_upd_on)
     return ('Scrap was updated.')
+
+@app.route('/last-upd-on')
+def get_last_upd_on():
+    scrap_tally = request.args.get('scrapTally', default=None, type=int)
+    last_upd_on = Getters.get_last_upd_on(scrap_tally)
+    return jsonify(last_upd_on)
 
 if __name__ == '__main__':
     app.run(debug=True)

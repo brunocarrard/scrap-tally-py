@@ -13,25 +13,30 @@ class ScrapTally:
         cursor.close()
         cnxn.close()
 
-    def updateScrap(payload):
+    def updateScrap(payload, defect, last_upd_on):
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
+
+        print(payload)
+        print(defect)
+        print(last_upd_on)
+
         cursor.execute("""
-            EXEC SIP_upd_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                       DECLARE @LastUpdatedOn nvarchar(30) = NULL           
+            EXEC SIP_upd_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @LastUpdatedOn OUTPUT, ?
                        """, (
-                           payload.get('ScrapTally'),
-                           payload.get('LastUpdatedOn'),
+                           payload.get('scrapTally'),
+                           last_upd_on,
                            datetime.today().date(),
-                           payload.get('MachCode'),
-                           str(payload.get('PartCode')),
-                           payload.get('MachGrpCode'),
-                           payload.get('FullSheetInd'),
-                           payload.get('Qty'),
-                           payload.get('DefectCode'),
-                           payload.get('Comment'),
+                           payload.get('machCode'),
+                           str(payload.get('partCode')),
+                           payload.get('machGrpCode'),
+                           payload.get('fullSheetInd'),
+                           payload.get('qty'),
+                           defect,
+                           payload.get('comment'),
                            0,
-                           payload.get('LastUpdatedOn'),
-                           payload.get('User')
+                           payload.get('user')
                        )
         )
 
