@@ -61,7 +61,6 @@ def post_scrap_tally():
 def get_scrap_tally():
     page = request.args.get('page', default=1, type=int)
     user_code = request.args.get('user_code', default=None, type=str)
-    print(page, user_code)
     scrap_tally = Getters.get_scrap_table(page, user_code)
     return jsonify(scrap_tally)
 
@@ -73,16 +72,12 @@ def update_scrap_tally():
     ScrapTally.updateScrap(payload, defect, last_upd_on)
     return ('Scrap was updated.')
 
-@app.route('/last-upd-on')
-def get_last_upd_on():
-    scrap_tally = request.args.get('scrapTally', default=None, type=int)
-    last_upd_on = Getters.get_last_upd_on(scrap_tally)
-    return jsonify(last_upd_on)
-
 @app.route('/scrap-tally', methods=['DELETE'])
 def delete_scrap_tally():
     payload = request.json
-    last_upd_on = Getters.get_last_upd_on(payload.get('scrapTally'))
+    scrap_tally = payload.get('scrapTally')
+    print(payload)
+    last_upd_on = Getters.get_last_upd_on(scrap_tally)
     ScrapTally.deleteScrap(payload, last_upd_on)
     return ('Scrap was deleted.')
 

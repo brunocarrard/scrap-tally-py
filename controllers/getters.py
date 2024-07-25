@@ -217,6 +217,7 @@ class Getters:
         page = []
         for item in items:
             item_dict = {
+                "scrapTally": 0,
                 "user": {},
                 "process": {},
                 "machine": {},
@@ -231,6 +232,8 @@ class Getters:
             for column, value in zip(cursor.description, item):
              # Check if the value is a string and strip whitespace if it is
                 column_name = column[0]
+                if column_name == "ScrapTally":
+                    item_dict["scrapTally"] = value
                 if column_name == "LastUpdatedBy":
                     item_dict["user"]["id"] = value.strip()
                 elif column_name == "FullName":
@@ -278,7 +281,7 @@ class Getters:
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
         query = "SELECT LastUpdatedOn FROM ST_LEG_ScrapTally WHERE ScrapTally = ?"
-        cursor.execute(query, (scrap_tally,))
+        cursor.execute(query, (scrap_tally))
         
         result = cursor.fetchone().LastUpdatedOn
 
