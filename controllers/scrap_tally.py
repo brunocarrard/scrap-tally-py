@@ -16,11 +16,6 @@ class ScrapTally:
     def updateScrap(payload, defect, last_upd_on):
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
-
-        print(payload)
-        print(defect)
-        print(last_upd_on)
-
         cursor.execute("""
                        DECLARE @LastUpdatedOn nvarchar(30) = NULL           
             EXEC SIP_upd_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @LastUpdatedOn OUTPUT, ?
@@ -37,6 +32,22 @@ class ScrapTally:
                            payload.get('comment'),
                            0,
                            payload.get('user')
+                       )
+        )
+
+        cursor.commit()
+        cursor.close()
+        cnxn.close()
+
+    def deleteScrap(payload, last_upd_on):
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+        cursor.execute("""EXEC SIP_del_LEG_ScrapTally ?, ?, ?, ?
+                       """, (
+                           payload.get('scrapTally'),
+                           last_upd_on,
+                           payload.get('user'),
+                           0
                        )
         )
 
