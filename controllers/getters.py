@@ -151,7 +151,7 @@ class Getters:
         result = [] 
 
         for row in rows:
-            result.append({"id":row[0].strip(), "description":row[1].strip()})
+            result.append({"id":row[0].strip(), "description":row[0].strip()})
         
         cursor.close()
         cnxn.close()
@@ -210,62 +210,63 @@ class Getters:
             SQL += " AND ST.LastUpdatedBy = ?"
         SQL += " ORDER BY Date DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
         if user_code is not None:
-            cursor.execute(SQL, (current_monday, current_friday, user_code, offset, per_page))
+            cursor.execute(SQL, (current_monday, current_friday, user_code, offset, per_page + 1))
         else:
-            cursor.execute(SQL, (current_monday, current_friday, offset, per_page))
+            cursor.execute(SQL, (current_monday, current_friday, offset, per_page + 1))
         items = cursor.fetchall()
         page = []
-        for item in items:
-            item_dict = {
-                "scrapTally": 0,
-                "user": {},
-                "process": {},
-                "machine": {},
-                "part": {},
-                "defectType": {},
-                "defectCondition": {},
-                "date": datetime.today().date(),
-                "fullSheetInd": False,
-                "qty": 0,
-                "comment": ""
-            }
-            for column, value in zip(cursor.description, item):
-             # Check if the value is a string and strip whitespace if it is
-                column_name = column[0]
-                if column_name == "ScrapTally":
-                    item_dict["scrapTally"] = value
-                if column_name == "LastUpdatedBy":
-                    item_dict["user"]["id"] = value.strip()
-                elif column_name == "FullName":
-                    item_dict["user"]["description"] = value.strip()
-                elif column_name == "MachGrpCode":  
-                    item_dict["process"]["id"] = value.strip()
-                elif column_name == "MachGrpDescription":  
-                    item_dict["process"]["description"] = value.strip()
-                elif column_name == "MachCode":  
-                    item_dict["machine"]["id"] = value.strip()
-                elif column_name == "MachDescription":  
-                    item_dict["machine"]["description"] = value.strip()
-                elif column_name == "PartCode":  
-                    item_dict["part"]["id"] = value.strip()
-                elif column_name == "PartDescription":  
-                    item_dict["part"]["description"] = value.strip()
-                elif column_name == "DefectType":  
-                    item_dict["defectType"]["description"] = value.strip()
-                elif column_name == "DefectCondition": 
-                    item_dict["defectCondition"]["description"] = value.strip()
-                elif column_name == "Date":  
-                    item_dict["date"] = value.date()
-                elif column_name == "FullSheetInd": 
-                    item_dict["fullSheetInd"] = value
-                elif column_name == "Qty":  
-                    item_dict["qty"] = value
-                elif column_name == "Comment": 
-                    item_dict["comment"] = value.strip()
-            page.append(item_dict)
+        for index, item in enumerate(items):
+            if index != 10:
+                item_dict = {
+                    "scrapTally": 0,
+                    "user": {},
+                    "process": {},
+                    "machine": {},
+                    "part": {},
+                    "defectType": {},
+                    "defectCondition": {},
+                    "date": datetime.today().date(),
+                    "fullSheetInd": False,
+                    "qty": 0,
+                    "comment": ""
+                }
+                for column, value in zip(cursor.description, item):
+                # Check if the value is a string and strip whitespace if it is
+                    column_name = column[0]
+                    if column_name == "ScrapTally":
+                        item_dict["scrapTally"] = value
+                    if column_name == "LastUpdatedBy":
+                        item_dict["user"]["id"] = value.strip()
+                    elif column_name == "FullName":
+                        item_dict["user"]["description"] = value.strip()
+                    elif column_name == "MachGrpCode":  
+                        item_dict["process"]["id"] = value.strip()
+                    elif column_name == "MachGrpDescription":  
+                        item_dict["process"]["description"] = value.strip()
+                    elif column_name == "MachCode":  
+                        item_dict["machine"]["id"] = value.strip()
+                    elif column_name == "MachDescription":  
+                        item_dict["machine"]["description"] = value.strip()
+                    elif column_name == "PartCode":  
+                        item_dict["part"]["id"] = value.strip()
+                    elif column_name == "PartDescription":  
+                        item_dict["part"]["description"] = value.strip()
+                    elif column_name == "DefectType":  
+                        item_dict["defectType"]["description"] = value.strip()
+                    elif column_name == "DefectCondition": 
+                        item_dict["defectCondition"]["description"] = value.strip()
+                    elif column_name == "Date":  
+                        item_dict["date"] = value.date()
+                    elif column_name == "FullSheetInd": 
+                        item_dict["fullSheetInd"] = value
+                    elif column_name == "Qty":  
+                        item_dict["qty"] = value
+                    elif column_name == "Comment": 
+                        item_dict["comment"] = value.strip()
+                page.append(item_dict)
         cursor.close()
         cnxn.close()
-        if len(page) < 10:
+        if len(items) < 11:
             result = {
                 "last_page": True,
                 "page": page
