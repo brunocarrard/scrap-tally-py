@@ -7,8 +7,8 @@ class ScrapTally:
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
         cursor.execute("""
-            EXEC SIP_ins_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, 0, ?
-                       """, (datetime.today().date(), payload.get('machCode'), str(payload.get('partCode')), payload.get('machGrpCode'), payload.get('fullSheetInd'), payload.get('qty'), defect, payload.get('comment'), payload.get('user')))
+            EXEC SIP_ins_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?
+                       """, (datetime.today().date(), payload.get('user'), payload.get('machCode'), str(payload.get('producedPart')), str(payload.get('rawMaterial')), payload.get('machGrpCode'), payload.get('qty'), defect, payload.get('comment'), payload.get('user')))
         cursor.commit()
         cursor.close()
         cnxn.close()
@@ -18,15 +18,16 @@ class ScrapTally:
         cursor = cnxn.cursor()
         cursor.execute("""
                        DECLARE @LastUpdatedOn nvarchar(30) = NULL           
-            EXEC SIP_upd_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @LastUpdatedOn OUTPUT, ?
+            EXEC SIP_upd_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @LastUpdatedOn OUTPUT, ?
                        """, (
                            payload.get('scrapTally'),
                            last_upd_on,
                            datetime.today().date(),
+                           payload.get('user'),
                            payload.get('machCode'),
-                           str(payload.get('partCode')),
+                           str(payload.get('producedPart')),
+                           str(payload.get('rawMaterial')),
                            payload.get('machGrpCode'),
-                           payload.get('fullSheetInd'),
                            payload.get('qty'),
                            defect,
                            payload.get('comment'),

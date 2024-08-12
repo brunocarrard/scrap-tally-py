@@ -151,12 +151,31 @@ class Getters:
         result = [] 
 
         for row in rows:
-            result.append({"id":row[0].strip(), "description":row[0].strip()})
+            result.append({"id":row[0].strip(), "description":row[1].strip()})
         
         cursor.close()
         cnxn.close()
         return result
     
+    def get_raw_materials(produced_part):
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+        cursor.execute("""
+            SELECT BOM.SubPartCode, BOM.[Description]
+            FROM T_Part P
+            LEFT JOIN T_BillOfMat BOM ON P.PartCode = BOM.PartCode
+            WHERE p.partcode = ?
+                    """, (produced_part))
+        rows = cursor.fetchall() 
+        result = [] 
+
+        for row in rows:
+            result.append({"id":row[0].strip(), "description":row[1].strip()})
+        
+        cursor.close()
+        cnxn.close()
+        return result
+
     def get_part_type(part):
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
@@ -195,19 +214,21 @@ class Getters:
                     E.FullName,
                     MG.Description 'MachGrpDescription',
                     M.Description 'MachDescription',
-                    P.Description 'PartDescription',
+                    P.Description 'ProducedPartDescription',
+                    P2.Description 'RawMaterialDescription',
                     D.DefectType,
                     D.DefectCondition
             FROM ST_LEG_ScrapTally ST
-            LEFT JOIN T_Employee E ON ST.LastUpdatedBy = E.EmpId
+            LEFT JOIN T_Employee E ON ST.Operator = E.EmpId
             LEFT JOIN T_MachGrp MG ON ST.MachGrpCode = MG.MachGrpCode
             LEFT JOIN T_Mach M ON M.MachCode = ST.MachCode
-            LEFT JOIN T_Part P ON ST.PartCode = P.PartCode
+            LEFT JOIN T_Part P ON ST.ProducedPart = P.PartCode
+            LEFT JOIN T_Part P2 ON ST.RawMaterial = P2.PartCode
             LEFT JOIN ST_LEG_Defect D ON ST.DefectCode = D.DefectCode
             WHERE Date BETWEEN ? AND ?
                        """
         if user_code is not None:
-            SQL += " AND ST.LastUpdatedBy = ?"
+            SQL += " AND ST.Operator = ?"
         SQL += " ORDER BY Date DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
         if user_code is not None:
             cursor.execute(SQL, (current_monday, current_friday, user_code, offset, per_page + 1))
@@ -219,26 +240,27 @@ class Getters:
             if index != 10:
                 item_dict = {
                     "scrapTally": 0,
-                    "user": {},
+                    "operator": {},
                     "process": {},
                     "machine": {},
-                    "part": {},
+                    "producedPart": {},
+                    "rawMaterial": {},
                     "defectType": {},
                     "defectCondition": {},
                     "date": datetime.today().date(),
-                    "fullSheetInd": False,
                     "qty": 0,
-                    "comment": ""
+                    "comment": "",
+                    "processed": False
                 }
                 for column, value in zip(cursor.description, item):
                 # Check if the value is a string and strip whitespace if it is
                     column_name = column[0]
                     if column_name == "ScrapTally":
                         item_dict["scrapTally"] = value
-                    if column_name == "LastUpdatedBy":
-                        item_dict["user"]["id"] = value.strip()
+                    if column_name == "Operator":
+                        item_dict["operator"]["id"] = value.strip()
                     elif column_name == "FullName":
-                        item_dict["user"]["description"] = value.strip()
+                        item_dict["operator"]["description"] = value.strip()
                     elif column_name == "MachGrpCode":  
                         item_dict["process"]["id"] = value.strip()
                     elif column_name == "MachGrpDescription":  
@@ -247,22 +269,26 @@ class Getters:
                         item_dict["machine"]["id"] = value.strip()
                     elif column_name == "MachDescription":  
                         item_dict["machine"]["description"] = value.strip()
-                    elif column_name == "PartCode":  
-                        item_dict["part"]["id"] = value.strip()
-                    elif column_name == "PartDescription":  
-                        item_dict["part"]["description"] = value.strip()
+                    elif column_name == "ProducedPart":  
+                        item_dict["producedPart"]["id"] = value.strip()
+                    elif column_name == "ProducedPartDescription":  
+                        item_dict["producedPart"]["description"] = value.strip()
+                    elif column_name == "RawMaterial":  
+                        item_dict["rawMaterial"]["id"] = value.strip()
+                    elif column_name == "RawMaterialDescription":  
+                        item_dict["rawMaterial"]["description"] = value.strip()
                     elif column_name == "DefectType":  
                         item_dict["defectType"]["description"] = value.strip()
                     elif column_name == "DefectCondition": 
                         item_dict["defectCondition"]["description"] = value.strip()
                     elif column_name == "Date":  
                         item_dict["date"] = value.date()
-                    elif column_name == "FullSheetInd": 
-                        item_dict["fullSheetInd"] = value
                     elif column_name == "Qty":  
                         item_dict["qty"] = value
                     elif column_name == "Comment": 
                         item_dict["comment"] = value.strip()
+                    elif column_name == "ProcessedInd": 
+                        item_dict["processed"] = value
                 page.append(item_dict)
         cursor.close()
         cnxn.close()

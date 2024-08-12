@@ -44,6 +44,14 @@ def get_parts():
         return jsonify({"error": "No part found for this process."}), 404
     return jsonify(parts)
 
+@app.route('/raw-materials') 
+def get_raw_materials():
+    produced_part = request.args.get('producedPart', default='', type=str)
+    raw_materials = Getters.get_raw_materials(produced_part) 
+    if len(raw_materials) == 0:
+        return jsonify({"error": "No raw material found for this part."}), 404
+    return jsonify(raw_materials)
+
 @app.route('/part-type') 
 def get_part_type():
     part = request.args.get('part', default='', type=str)
