@@ -17,8 +17,21 @@ class ScrapTally:
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
         cursor.execute("""
-                       DECLARE @LastUpdatedOn nvarchar(30) = NULL           
-            EXEC SIP_upd_LEG_ScrapTally ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, @LastUpdatedOn OUTPUT, ?
+                    DECLARE @LastUpdatedOn nvarchar(30) = NULL           
+                    EXEC SIP_upd_LEG_ScrapTally @old_ScrapTally = ?, 
+                                                @old_LastUpdatedOn = ?, 
+                                                @Date = ?,
+                                                @Operator = ?, 
+                                                @MachCode = ?, 
+                                                @ProducedPart = ?,
+                                                @RawMaterial = ?,
+                                                @MachGrpCode = ?,
+                                                @Qty = ?,
+                                                @DefectCode = ?, 
+                                                @Comment = ?,
+                                                @LogProgramCode = ?, 
+                                                @LastUpdatedOn =  @LastUpdatedOn OUTPUT,
+                                                @IsahUserCode = ?
                        """, (
                            payload.get('scrapTally'),
                            last_upd_on,
