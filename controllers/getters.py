@@ -7,9 +7,13 @@ class Getters:
         cursor = cnxn.cursor()
         
         # SFC (shop floor control) is operators, SFA (shop floor admin) should also have access?
-        cursor.execute("""SELECT DISTINCT u.Usercode, e.[FullName] 
-                       FROM T_UserFunction U INNER JOIN T_employee E on U.UserCode = E.EmpId 
-                       WHERE UserGrpCode IN ('SFC', 'SFA') AND UserCode <> N''""")
+        cursor.execute("""
+            SELECT DISTINCT u.Usercode, e.[FullName] 
+            FROM T_UserFunction U
+            INNER JOIN UserRegistration UR ON U.UserCode = UR.UserCode
+            INNER JOIN T_employee E on UR.EmpId = E.EmpId
+            WHERE UserGrpCode = 'SFC' AND U.UserCode <> N'' AND U.ActiveInd = 1
+        """)
 
         rows = cursor.fetchall()
 
@@ -219,7 +223,8 @@ class Getters:
                     D.DefectType,
                     D.DefectCondition
             FROM ST_LEG_ScrapTally ST
-            LEFT JOIN T_Employee E ON ST.Operator = E.EmpId
+            LEFT JOIN UserRegistration UR ON ST.Operator = UR.UserCode
+            LEFT JOIN T_Employee E ON UR.EmpId = E.EmpId
             LEFT JOIN T_MachGrp MG ON ST.MachGrpCode = MG.MachGrpCode
             LEFT JOIN T_Mach M ON M.MachCode = ST.MachCode
             LEFT JOIN T_Part P ON ST.ProducedPart = P.PartCode
