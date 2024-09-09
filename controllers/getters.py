@@ -138,7 +138,7 @@ class Getters:
     
 
     def get_parts(process):
-        current_monday = datetime.today() - timedelta(days=datetime.today().weekday())
+        current_monday = (datetime.today() - timedelta(days=datetime.today().weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
         current_friday = current_monday + timedelta(days=4)
 
         cnxn = DatabaseConnection.get_db_connection()
@@ -209,7 +209,7 @@ class Getters:
     def get_scrap_table(page, user_code):
         per_page = 10
         offset = (page - 1) * per_page
-        current_monday = datetime.today().date() - timedelta(days=datetime.today().weekday())
+        current_monday = (datetime.today() - timedelta(days=datetime.today().weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
         current_friday = current_monday + timedelta(days=4)
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
