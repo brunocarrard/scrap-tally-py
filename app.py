@@ -89,5 +89,11 @@ def delete_scrap_tally():
     ScrapTally.deleteScrap(payload, last_upd_on)
     return ('Scrap was deleted.')
 
+@app.route('/part-identity')
+def get_part_certificate_lotnr():
+    part = request.args.get('part', default='', type=str)
+    part_idendity = Getters.get_part_certificate_lotnr(part)
+    return jsonify(part_idendity)
+
 if __name__ == '__main__':
     app.run(debug=True)

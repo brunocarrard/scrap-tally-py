@@ -26,6 +26,31 @@ class Getters:
         cnxn.close()
         return result
     
+    def get_part_certificate_lotnr(part):
+        cnxn = DatabaseConnection.get_db_connection()
+        cursor = cnxn.cursor()
+        
+        # SFC (shop floor control) is operators, SFA (shop floor admin) should also have access?
+        cursor.execute("""
+            SELECT  CASE
+                        WHEN CertificateCode <> '' THEN CertificateCode
+                        ELSE LotNr
+                    END 'indentity'
+            FROM T_Inventory WHERE PartCode = ?
+        """, part)
+
+        rows = cursor.fetchall()
+
+        result = []
+
+        for row in rows:
+            if row[0].strip() != "":
+                result.append({"id":row[0].strip(), "description":row[0].strip()})
+
+        cursor.close()
+        cnxn.close()
+        return result
+    
     def get_processes():
         cnxn = DatabaseConnection.get_db_connection()
         cursor = cnxn.cursor()
@@ -155,7 +180,7 @@ class Getters:
         result = [] 
 
         for row in rows:
-            result.append({"id":row[0].strip(), "description":row[1].strip()})
+            result.append({"id":row[0].strip(), "description":row[0].strip()})
         
         cursor.close()
         cnxn.close()
@@ -174,7 +199,7 @@ class Getters:
         result = [] 
 
         for row in rows:
-            result.append({"id":row[0].strip(), "description":row[1].strip()})
+            result.append({"id":row[0].strip(), "description":row[0].strip()})
         
         cursor.close()
         cnxn.close()
@@ -255,6 +280,7 @@ class Getters:
                     "date": datetime.today().date(),
                     "qty": 0,
                     "comment": "",
+                    "identity": "",
                     "processed": False
                 }
                 for column, value in zip(cursor.description, item):
@@ -294,6 +320,10 @@ class Getters:
                         item_dict["comment"] = value.strip()
                     elif column_name == "ProcessedInd": 
                         item_dict["processed"] = value
+                    elif column_name == "LotNr" and value.strip() != "": 
+                        item_dict["identity"] = value.strip()
+                    elif column_name == "CertificateCode" and value.strip() != "": 
+                        item_dict["identity"] = value.strip()
                 page.append(item_dict)
         cursor.close()
         cnxn.close()
